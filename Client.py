@@ -8,12 +8,16 @@ class ws:
         if not wsUpState():
             raise ConnectionError(f"Unable to verify healty connection!")
 
-        wsSend(com)
+        return wsSend(com)
 
-        return wsMsg(com)
-
-    def msg(com=""):
+    def msg():
         if not wsUpState():
             raise ConnectionError(f"Unable to verify healty connection!")
 
-        return wsMsg(com)
+        return wsMsg()
+
+    def msgDict():
+        if not wsUpState():
+            raise ConnectionError(f"Unable to verify healty connection!")
+
+        return wsMsgDict()

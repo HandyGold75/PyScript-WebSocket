@@ -1,11 +1,23 @@
+function NEWMESSAGE(data) {
+    if (data.startsWith("{") && data.endsWith("}")) {
+        obj.msgDict = { ...obj.msgDict, ...JSON.parse(data) }
+    }
+
+    obj.lastMsg = data;
+
+    console.log("Got message: " + data)
+};
+
+
 class obj {
     ws;
     IP;
     PORT;
     lastCom;
-    lastMsg1;
-    lastMsg2;
-}
+    lastMsg;
+    msgDict;
+};
+
 
 function wsStart() {
     if (obj.ws === undefined) {
@@ -13,8 +25,8 @@ function wsStart() {
         obj.IP = "127.0.0.1";
         obj.PORT = 7005;
         obj.lastCom = "";
-        obj.lastMsg1 = "";
-        obj.lastMsg2 = "";
+        obj.lastMsg = "";
+        obj.msgDict = {};
 
         obj.ws = new WebSocket("ws://" + obj.IP + ":" + obj.PORT);
 
@@ -22,16 +34,15 @@ function wsStart() {
             console.log("Opened connection to ws://" + obj.IP + ":" + obj.PORT)
         };
 
+
         obj.ws.onmessage = ({ data }) => {
-            obj.lastMsg1 = data;
-            console.log("Got message: " + data)
-        };
+            NEWMESSAGE(data)
+        }
     }
 };
 
 
-
-function wsUpState(){
+function wsUpState() {
     if (obj.ws.readyState === 0 || obj.ws.readyState === 1) {
         return true
     }
@@ -39,23 +50,16 @@ function wsUpState(){
     else if (obj.ws.readyState === 2 || obj.ws.readyState === 3) {
         return false
     }
-}
-function wsCom(com) {
-    obj.lastCom = com
-    obj.ws.send(com)
 };
-function wsMsg(com) {
-    if (com == obj.lastCom && com != "") {
-        obj.lastMsg2 = obj.lastMsg1;
+function wsSend(com) {
+    obj.lastCom = com;
+    obj.ws.send(com);
 
-        return obj.lastMsg1
-    }
-
-    else if (obj.lastMsg1 != obj.lastMsg2) {
-        obj.lastMsg2 = obj.lastMsg1;
-        obj.lastCom = com;
-
-        return obj.lastMsg1
-    }
-    return false
+    return obj.lastCom
+};
+function wsMsg() {
+    return obj.lastMsg
+};
+function wsMsgDict() {
+    return obj.msgDict
 }
