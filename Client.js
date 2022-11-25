@@ -8,7 +8,6 @@ function NEWMESSAGE(data) {
     console.log("Got message: " + data)
 };
 
-
 class obj {
     ws;
     IP;
@@ -17,7 +16,6 @@ class obj {
     lastMsg;
     msgDict;
 };
-
 
 function wsStart() {
     if (obj.ws === undefined) {
@@ -41,7 +39,6 @@ function wsStart() {
     }
 };
 
-
 function wsUpState() {
     if (obj.ws.readyState === 0 || obj.ws.readyState === 1) {
         return true
@@ -51,15 +48,18 @@ function wsUpState() {
         return false
     }
 };
+
 function wsSend(com) {
     obj.lastCom = com;
     obj.ws.send(com);
 
     return obj.lastCom
 };
+
 function wsMsg() {
     return obj.lastMsg
 };
+
 function wsMsgDict() {
     return obj.msgDict
 }

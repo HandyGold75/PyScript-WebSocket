@@ -1,11 +1,32 @@
-from Client import ws
-from js import document, console
+from js import document, wsStart, wsUpState, wsSend, wsMsg, console
 from pyodide.ffi import create_proxy
 
+class ws:
+    def start():
+        return wsStart()
+
+    def send(com):
+        if not wsUpState():
+            raise ConnectionError(f"Unable to verify healty connection!")
+
+        return wsSend(com)
+
+    def msg():
+        if not wsUpState():
+            raise ConnectionError(f"Unable to verify healty connection!")
+
+        return wsMsg()
+
+    def msgDict():
+        if not wsUpState():
+            raise ConnectionError(f"Unable to verify healty connection!")
+
+        return wsMsgDict()
 
 def button(args=None):
     console.log(ws.send("A message for the server.")) # Send a message.
     console.log(ws.msg())                             # Get the latest received message.
+    console.log(ws.msgDict())                         # Get all the latest received dicts.
 
 
 def main():
