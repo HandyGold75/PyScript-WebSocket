@@ -19,7 +19,6 @@ class obj {
 
 function wsStart() {
     if (obj.ws === undefined) {
-        obj.ws = null;
         obj.IP = "127.0.0.1";
         obj.PORT = 7005;
         obj.lastCom = "";
@@ -31,7 +30,6 @@ function wsStart() {
         obj.ws.onopen = (event) => {
             console.log("Opened connection to ws://" + obj.IP + ":" + obj.PORT)
         };
-
 
         obj.ws.onmessage = ({ data }) => {
             NEWMESSAGE(data)
@@ -61,5 +59,5 @@ function wsMsg() {
 };
 
 function wsMsgDict() {
-    return obj.msgDict
+    return JSON.stringify(obj.msgDict)
 }
