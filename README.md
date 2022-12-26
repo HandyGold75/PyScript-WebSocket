@@ -29,4 +29,5 @@ To work around this events can be used, for eq. use event mousedown or mouseover
   * Raises ConnectionError if the client or the server has disconnected.
 * ws.msgDict
   * Returns all latest dicts from servers responses (defaults to a empty dict).
+  * First 2 layers are consistent, deeper layers will be removed if not present in the new request when the top layer is updated.
   * Raises ConnectionError if the client or the server has disconnected.
