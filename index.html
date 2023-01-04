@@ -12,8 +12,11 @@
 
 <body id="body">
     <div id="main"></div>
-    <script src="Client.js"></script>
-    <py-script src="Main.py"></py-script>
+    <py-config>
+        [[fetch]]
+        files = ["ws.py"]
+    </py-config>
+    <py-script src="index.py"></py-script>
 </body>
 
 </html>
