@@ -13,7 +13,7 @@ class glb:
 
 class ws:
     def onOpen(arg):
-        console.log(f'Opened connection to {glb.PROTO}://{glb.IP}:{glb.PORT}')
+        console.log(f"Opened connection to {glb.PROTO}://{glb.IP}:{glb.PORT}")
 
     def onMessage(arg):
         msg = arg.data
@@ -28,13 +28,13 @@ class ws:
 
                 glb.msgDict[dict] = {**glb.msgDict[dict], **data[dict]}
 
-        print(f'Received message: {msg}')
+        print(f"Received message: {msg}")
 
     def onError(arg):
         console.error(arg)
 
     def onClose(arg):
-        console.log(f'Closed connection to {glb.PROTO}://{glb.IP}:{glb.PORT}')
+        console.log(f"Closed connection to {glb.PROTO}://{glb.IP}:{glb.PORT}")
 
     def upState():
         if glb.ws.readyState in [0, 1]:
