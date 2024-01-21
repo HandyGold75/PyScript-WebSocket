@@ -1,8 +1,8 @@
 # PyScript-WebSocket
 
-A JavaScript WebSocket client meant to be used in PyScript.
+A JavaScript WebSocket client excample meant to be used in pyodide or PyScript.
 
-Pyodide doesn't support networking so networking actions are done in a JavaScript websocket client.
+Pyodide doesn't support networking so a JavaScript websocket client object is created and then parsed to the python script.
 
 _Note: I'm not an developer by profession and the code is far from best practice, this is just something I use personaly that I think might be usefull for someone else, if you see any improvements I'm open for suggestions._
 
@@ -10,23 +10,21 @@ _Note: I'm not an developer by profession and the code is far from best practice
 
 This is meant as a simple template/ demo.
 
-Note that when calling a ws function feedback (if any) can only be read after the hole script finshes, as the received messaged changes don't appear while the script is running.
-To work around this events can be used, for eq. use event mousedown or mouseover to send information request to the websocket server, if the server is fast enough then the event mouseup can be used to query the possible received information.
+Note that when calling a ws function feedback (if any) can only be read after the current event is finished.
+To work around this onMsg can be used, this can be used to setup an function to run or an reply to send to the server when an message is received.
 
-## Functions
+## Functions and variables
 
-* ws.start
-  * Set's up the WebSocket connection.
-  * This is not done at import so you have control when the connection is attempted.
-  * Takes 3 arguments which the protocol, ip and port that the websocket needs to connect to.
 * ws.send
   * Send a message to the server.
   * Takes 1 arguments which is the message that needs to be send.
   * Raises ConnectionError if the client or the server has disconnected.
-* ws.msg
-  * Returns the latest servers response (defaults to a blank string).
-  * Raises ConnectionError if the client or the server has disconnected.
+* ws.lastMsg
+  * Contains the latest servers response.
 * ws.msgDict
-  * Returns all latest dicts from servers responses (defaults to a empty dict).
+  * Returns all latest dicts from servers responses.
   * First 2 layers are consistent, deeper layers will be removed if not present in the new request when the top layer is updated.
-  * Raises ConnectionError if the client or the server has disconnected.
+* ws.onMsg
+  * Set up an function to run when an received message by the server starts with the selected message.
+  * Can also be set up to send a message to the server instead of running an function.
+  * oneTime determinace if this should be done once or ever time.

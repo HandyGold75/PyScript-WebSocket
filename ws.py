@@ -1,81 +1,76 @@
 from json import loads
-from js import eval, console
+
+from js import eval
 
 
-class glb:
-    PROTO = ""
-    IP = ""
-    PORT = ""
-    ws = None
-    lastMsg = ""
-    msgDict = {}
+class WS:
+    def __init__(self, protocol, ip, port) -> None:
+        self.PROTO = protocol
+        self.IP = ip
+        self.PORT = port
 
+        ws = eval(f'new WebSocket("{self.PROTO}://{self.IP}:{self.PORT}")')
 
-class ws:
-    def onOpen(arg):
-        console.log(f"Opened connection to {glb.PROTO}://{glb.IP}:{glb.PORT}")
+        ws.onopen = self.onOpen
+        ws.onmessage = self.onMessage
+        ws.onerror = self.onError
+        ws.onclose = self.onClose
 
-    def onMessage(arg):
+        self.lastMsg = ""
+        self.msgDict = {}
+        self.msgReply = {}
+
+    def onOpen(self, arg):
+        print(f"Opened connection to {self.PROTO}://{self.IP}:{self.PORT}")
+
+    def onMessage(self, arg):
         msg = arg.data
-        glb.lastMsg = msg
+        self.lastMsg = msg
 
         if msg.startswith("{") and msg.endswith("}"):
             data = loads(msg)
 
             for dict in data:
-                if not dict in glb.msgDict:
-                    glb.msgDict[dict] = {}
+                if not dict in self.msgDict:
+                    self.msgDict[dict] = {}
 
-                glb.msgDict[dict] = {**glb.msgDict[dict], **data[dict]}
+                self.msgDict[dict] = {**self.msgDict[dict], **data[dict]}
 
         print(f"Received message: {msg}")
 
-    def onError(arg):
-        console.error(arg)
+        if msg.split(" ")[0] in self.msgReply:
+            msg = msg.split(" ")[0]
+        elif " ".join(msg.split(" ")[:2]) in self.msgReply:
+            msg = " ".join(msg.split(" ")[:2])
+        else:
+            return None
 
-    def onClose(arg):
-        console.log(f"Closed connection to {glb.PROTO}://{glb.IP}:{glb.PORT}")
+        msgOrFunc, funcArgs, funcKwargs = self.msgReply[msg][1:]
+        if self.msgReply[msg][0]:
+            self.msgReply.pop(msg)
 
-    def upState():
-        if glb.ws.readyState in [0, 1]:
+        if callable(msgOrFunc):
+            msgOrFunc(*funcArgs, **funcKwargs)
+        else:
+            self.ws.send(msgOrFunc)
+
+    def onError(self, arg):
+        print(arg)
+
+    def onClose(self, arg):
+        print(f"Closed connection to {self.PROTO}://{self.IP}:{self.PORT}")
+
+    def upState(self):
+        if self.ws.readyState in [0, 1]:
             return True
 
-        elif glb.ws.readyState in [2, 3]:
-            return False
+        return False
 
+    def send(self, com):
+        if not self.upState():
+            raise ConnectionError(f"Unable to verify healty connection!")
 
-def start(protocol: str, ip: str, port: str):
-    if not glb.ws is None:
-        return None
+        self.ws.send(com)
 
-    glb.PROTO = str(protocol)[:3]
-    glb.IP = str(ip[:32])
-    glb.PORT = str(port)[:5]
-
-    glb.ws = eval(f'new WebSocket("{glb.PROTO}://{glb.IP}:{glb.PORT}")')
-
-    glb.ws.onopen = ws.onOpen
-    glb.ws.onmessage = ws.onMessage
-    glb.ws.onerror = ws.onError
-    glb.ws.onclose = ws.onClose
-
-
-def send(com):
-    if not ws.upState():
-        raise ConnectionError(f"Unable to verify healty connection!")
-
-    glb.ws.send(com)
-
-
-def msg():
-    if not ws.upState():
-        raise ConnectionError(f"Unable to verify healty connection!")
-
-    return glb.lastMsg
-
-
-def msgDict():
-    if not ws.upState():
-        raise ConnectionError(f"Unable to verify healty connection!")
-
-    return glb.msgDict
+    def onMsg(self, msgRecv: str, msgOrFunc: str, args: tuple = (), kwargs: dict = {}, oneTime: bool = False):
+        self.msgReply[msgRecv] = (oneTime, msgOrFunc, args, kwargs)

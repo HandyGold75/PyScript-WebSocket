@@ -1,18 +1,22 @@
-import ws
-from js import document, console
-from pyodide.ffi import create_proxy # type: ignore
+from js import document
+from pyodide.ffi import create_proxy  # type: ignore
+
+from ws import WS
+
+websocket = WS("ws", "127.0.0.1", "7005")  # Set's up the WebSocket connection.
 
 
 def button(args=None):
-    ws.send("Hello Server!")  # Send a message to the server.
-    console.log(ws.msg())  # Get the latest servers response.
-    console.log(ws.msgDict())  # Get all latest dicts from servers responses.
+    websocket.send("Hello Server!")  # Send a message to the server.
+    print(websocket.msg())  # Get the latest servers response.
+    print(websocket.msgDict())  # Get all latest dicts from servers responses.
+
+    websocket.onMsg("Pong", lambda: print(websocket.msg()))  # Log the latest servers response after receiving an message starting with Pong
+    websocket.send("Ping")  # Send a message to the server.
 
 
 def main():
-    ws.start("ws", "127.0.0.1", "7005")  # Set's up the WebSocket connection.
-
-    document.getElementById("main").innerHTML = f'<button id="button" type="submit">A button</button>'
+    document.getElementById("body").innerHTML = f'<button id="button" type="submit">A button</button>'
     document.getElementById("button").addEventListener("click", create_proxy(button))
 
 
